@@ -1,0 +1,2 @@
+prefix = '$'
+login_key = 'MTE3ODMwMDg5ODU2MTI0OTM5MQ.GreTOT.CsLyJc3eES-gFOKqMlDFzAGDtfXVCdT6ZOILgk'
