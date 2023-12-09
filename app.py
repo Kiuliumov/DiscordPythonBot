@@ -26,18 +26,19 @@ async def ping(interaction: discord.Interaction):
 
 @client.tree.command(name='info', description='This is an info command!')
 async def info(interaction: discord.Interaction):
-    embed = discord.Embed(title ='Info!',
-    url ='https://discord.gg/YRyN5ZY4' ,
-    description = 'Under construction',
-    color = 0xFF5733)
-    embed.set_author(name = 'Kiuliumov',url='https://discord.gg/YRyN5ZY4',icon_url='https://i.imgur.com/oPkwCHZ.jpg')
-    embed.set_image(url = 'https://images-ext-2.discordapp.net/external/sSU94Q41MQgIIX0XiXXyDOcGeiY6__xq2eS_zQ33v34/%3Fcid%3D73b8f7b12ba3c3497960d92cf377ac6ee4d8a3e4046135c6%26rid%3Dgiphy.mp4%26ct%3Dg/https/media2.giphy.com/media/Nx0rz3jtxtEre/giphy.mp4')
+    embed = discord.Embed(
+        title='Info!',
+        url='https://discord.gg/YRyN5ZY4',
+        description='This is a chatbot that I am creating for fun, so please don\'t judge it too harshly!',
+        color=0xFF5733
+    )
+    embed.set_author(name='Kiuliumov', url='https://discord.gg/YRyN5ZY4', icon_url='https://i.imgur.com/oPkwCHZ.jpg')
+    embed.set_thumbnail(url='')
+    embed.add_field(name='Instagram:', value='[dkiuliumov](https://www.instagram.com/dkiuliumov/)', inline=False)
+    embed.add_field(name='Github:', value='[Kiuliumov](https://github.com/Kiuliumov)', inline=False)
+    embed.add_field(name='YouTube:', value='[Kiuliumov](https://www.youtube.com/channel/UC84Nzj5Ruyc-ltYUU53pxHg)', inline=False)
+    embed.add_field(name='Discord:', value='Kiuliumov', inline=False)
     await interaction.response.send_message(embed=embed)
-
-
-
-
-
 
 @client.tree.command(name='dogpicture',description='Sends a random dog picture')
 async def dogpicture(interaction:discord.Interaction):
@@ -45,6 +46,7 @@ async def dogpicture(interaction:discord.Interaction):
    picture = response_API.json()
    picture = picture['message']
    await interaction.response.send_message(picture)
+
 
 @client.tree.command(name='roll',description='Rolls a random number between 1 and 100!')
 async def diceroll(interaction:discord.Interaction):
