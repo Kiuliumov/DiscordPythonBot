@@ -81,7 +81,6 @@ async def diceroll(interaction: discord.Interaction):
 async def balance(interaction: discord.Interaction):
     await open_account(interaction.user.id)
     users = await get_bank_data()
-    wallet_amount = users[str(interaction.user.id)]['wallet']
     bank_amount = users[str(interaction.user.id)]['bank']
 
     embed = discord.Embed(
@@ -92,5 +91,14 @@ async def balance(interaction: discord.Interaction):
     embed.add_field(name='',value=bank_amount)
 
     await interaction.response.send_message(embed=embed)
-
+@client.tree.command(name='leaderboard',description='Shows who are the richest people on the server!')
+async def leaderboard(interaction:discord.Interaction):
+    with open('bank.json', 'r') as file:
+     data = json.load(file)
+     account_list = [{"id": acc_id, "balance": acc_data["bank"]} for acc_id, acc_data in data.items()]
+     sorted_accounts = sorted(account_list, key=lambda x: x['balance'], reverse=True)
+     for i in range(1,3):
+           account = sorted_accounts[i]
+           await interaction.response.send_message(f"{i+1}. Account ID: {account['id']} - Balance: ${account['balance']}")
+    
 client.run(login_key)
