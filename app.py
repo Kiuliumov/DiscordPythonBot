@@ -1,12 +1,33 @@
-from apikeys import *
-import random
 import discord
-from discord import app_commands
 from discord.ext import commands
+import json
+import os
+from apikeys import login_key
+import random
 import requests
-#-------------------------------------------------------------------------------
 intents = discord.Intents.default()
-client = commands.Bot(command_prefix=prefix, intents=intents)
+client = commands.Bot(command_prefix="!", intents=intents)
+
+# Change this to your own path
+os.chdir("C:\\Users\\mitib\\OneDrive\\Documents\\GitHub\\DiscordPythonBot\\")
+
+async def open_account(user_id):
+    with open('bank.json', 'r') as f:
+        users = json.load(f)
+
+    if str(user_id) in users:
+        return False
+    else:
+        users[str(user_id)] = {'bank': 500}
+
+    with open('bank.json', 'w') as f:
+        json.dump(users, f)
+    return True
+
+async def get_bank_data():
+    with open('bank.json', 'r') as f:
+        users = json.load(f)
+    return users
 
 @client.event
 async def on_ready():
@@ -22,7 +43,6 @@ async def on_ready():
 @client.tree.command(name='ping', description='This is a ping command!')
 async def ping(interaction: discord.Interaction):
     await interaction.response.send_message(f'Pong! The client latency is {round(client.latency * 1000)}ms.')
-
 
 @client.tree.command(name='info', description='This is an info command!')
 async def info(interaction: discord.Interaction):
@@ -40,23 +60,37 @@ async def info(interaction: discord.Interaction):
     embed.add_field(name='Discord:', value='Kiuliumov', inline=False)
     await interaction.response.send_message(embed=embed)
 
-@client.tree.command(name='dogpicture',description='Sends a random dog picture')
-async def dogpicture(interaction:discord.Interaction):
-   response_API = requests.get('https://dog.ceo/api/breeds/image/random')
-   picture = response_API.json()
-   picture = picture['message']
-   await interaction.response.send_message(picture)
+@client.tree.command(name='dogpicture', description='Sends a random dog picture')
+async def dogpicture(interaction: discord.Interaction):
+    response_API = requests.get('https://dog.ceo/api/breeds/image/random')
+    picture = response_API.json()
+    picture = picture['message']
+    await interaction.response.send_message(picture)
 
-
-@client.tree.command(name='roll',description='Rolls a random number between 1 and 100!')
-async def diceroll(interaction:discord.Interaction):
-    roll = random.randint(1,100)
+@client.tree.command(name='roll', description='Rolls a random number between 1 and 100!')
+async def diceroll(interaction: discord.Interaction):
+    roll = random.randint(1, 100)
     id = interaction.user.name
-    embed = discord.Embed(title ='Roll!',
-    url ='https://discord.gg/YRyN5ZY4' ,
-    description = f'{(str(id)).capitalize()} has rolled {roll}!',
-    color = 0xFF5733)
+    embed = discord.Embed(title='Roll!',
+                          url='https://discord.gg/YRyN5ZY4',
+                          description=f'{(str(id)).capitalize()} has rolled {roll}!',
+                          color=0xFF5733)
     await interaction.response.send_message(embed=embed)
 
-   
+@client.tree.command(name='balance', description='Check your balance')
+async def balance(interaction: discord.Interaction):
+    await open_account(interaction.user.id)
+    users = await get_bank_data()
+    wallet_amount = users[str(interaction.user.id)]['wallet']
+    bank_amount = users[str(interaction.user.id)]['bank']
+
+    embed = discord.Embed(
+        title='Balance',
+        description=f"{interaction.user.name.capitalize()}'s balance!",
+        color=0xFF5733
+    )
+    embed.add_field(name='',value=bank_amount)
+
+    await interaction.response.send_message(embed=embed)
+
 client.run(login_key)
