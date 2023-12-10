@@ -7,9 +7,22 @@ import random
 import requests
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix="!", intents=intents)
-
-# Change this to your own path
 os.chdir("C:\\Users\\mitib\\OneDrive\\Documents\\GitHub\\DiscordPythonBot\\")
+
+dice_roll_cooldown = commands.CooldownMapping.from_cooldown(1, 3600, commands.BucketType.user)
+
+async def add_coins(user_id, coins_to_add):
+    
+    with open('bank.json', 'r') as f:
+        users = json.load(f)
+        users[str(user_id)]['bank'] += coins_to_add
+    with open('bank.json', 'w') as f:
+        json.dump(users, f, indent=2)
+    return users[str(user_id)]['bank']
+
+
+
+
 
 async def open_account(user_id):
     with open('bank.json', 'r') as f:
@@ -66,8 +79,7 @@ async def dogpicture(interaction: discord.Interaction):
     picture = response_API.json()
     picture = picture['message']
     await interaction.response.send_message(picture)
-
-@client.tree.command(name='roll', description='Rolls a random number between 1 and 100!')
+@client.tree.command(name='roll', description='Rolls a random number between 1 and 100 and gives you this many cantina coins!')
 async def diceroll(interaction: discord.Interaction):
     roll = random.randint(1, 100)
     id = interaction.user.name
@@ -76,6 +88,7 @@ async def diceroll(interaction: discord.Interaction):
                           description=f'{(str(id)).capitalize()} has rolled {roll}!',
                           color=0xFF5733)
     await interaction.response.send_message(embed=embed)
+    await add_coins(interaction.user.id, roll)
 
 @client.tree.command(name='balance', description='Check your balance')
 async def balance(interaction: discord.Interaction):
@@ -88,17 +101,8 @@ async def balance(interaction: discord.Interaction):
         description=f"{interaction.user.name.capitalize()}'s balance!",
         color=0xFF5733
     )
-    embed.add_field(name='',value=bank_amount)
+    embed.add_field(name='',value=f'{bank_amount} Cantina Coins')
 
     await interaction.response.send_message(embed=embed)
-@client.tree.command(name='leaderboard',description='Shows who are the richest people on the server!')
-async def leaderboard(interaction:discord.Interaction):
-    with open('bank.json', 'r') as file:
-     data = json.load(file)
-     account_list = [{"id": acc_id, "balance": acc_data["bank"]} for acc_id, acc_data in data.items()]
-     sorted_accounts = sorted(account_list, key=lambda x: x['balance'], reverse=True)
-     for i in range(1,3):
-           account = sorted_accounts[i]
-           await interaction.response.send_message(f"{i+1}. Account ID: {account['id']} - Balance: ${account['balance']}")
-    
+
 client.run(login_key)
