@@ -1,3 +1,4 @@
+
 import discord
 from discord.ext import commands
 import json
@@ -5,6 +6,7 @@ import os
 from apikeys import login_key
 import random
 import requests
+
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix="!", intents=intents)
 os.chdir("C:\\Users\\mitib\\OneDrive\\Documents\\GitHub\\DiscordPythonBot\\")
@@ -81,7 +83,7 @@ import discord
 import random
 
 @client.tree.command(name='roll', description='Rolls a random number between 1 and 100 and gives you this many cantina coins!')
-@discord.app_commands.checks.cooldown(1, 5.0, key=lambda i: (i.guild_id, i.user.id))
+@discord.app_commands.checks.cooldown(1,28800, key=lambda i: (i.guild_id, i.user.id))
 async def diceroll(interaction: discord.Interaction):
     roll = random.randint(1, 100)
     id = interaction.user.name
@@ -91,6 +93,15 @@ async def diceroll(interaction: discord.Interaction):
                           color=0xFF5733)
     await interaction.response.send_message(embed=embed)
     await add_coins(interaction.user.id, roll)
+@client.tree.error
+async def on_test_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+    if isinstance(error, discord.app_commands.CommandOnCooldown):
+        remaining_time = round(error.retry_after, 2)
+        hours = int(remaining_time // 3600)
+        minutes = int((remaining_time % 3600) // 60)
+        seconds = int(remaining_time % 60)
+        await interaction.response.send_message(f"This command is on cooldown. Please try again in {hours} hours, {minutes} minutes, and {seconds} seconds.", ephemeral=True)
+@client.tree.command(name='rps',description='Plays rock paper scissors')
 
 @client.tree.command(name='balance', description='Check your balance')
 async def balance(interaction: discord.Interaction):
