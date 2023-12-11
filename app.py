@@ -9,8 +9,6 @@ intents = discord.Intents.default()
 client = commands.Bot(command_prefix="!", intents=intents)
 os.chdir("C:\\Users\\mitib\\OneDrive\\Documents\\GitHub\\DiscordPythonBot\\")
 
-dice_roll_cooldown = commands.CooldownMapping.from_cooldown(1, 3600, commands.BucketType.user)
-
 async def add_coins(user_id, coins_to_add):
     
     with open('bank.json', 'r') as f:
@@ -79,7 +77,11 @@ async def dogpicture(interaction: discord.Interaction):
     picture = response_API.json()
     picture = picture['message']
     await interaction.response.send_message(picture)
+import discord
+import random
+
 @client.tree.command(name='roll', description='Rolls a random number between 1 and 100 and gives you this many cantina coins!')
+@discord.app_commands.checks.cooldown(1, 5.0, key=lambda i: (i.guild_id, i.user.id))
 async def diceroll(interaction: discord.Interaction):
     roll = random.randint(1, 100)
     id = interaction.user.name
@@ -89,6 +91,10 @@ async def diceroll(interaction: discord.Interaction):
                           color=0xFF5733)
     await interaction.response.send_message(embed=embed)
     await add_coins(interaction.user.id, roll)
+@test.error
+async def on_test_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
+    if isinstance(error, discord.app_commands.CommandOnCooldown):
+        await interaction.response.send_message(str(error), ephemeral=True)
 
 @client.tree.command(name='balance', description='Check your balance')
 async def balance(interaction: discord.Interaction):
@@ -102,7 +108,6 @@ async def balance(interaction: discord.Interaction):
         color=0xFF5733
     )
     embed.add_field(name='',value=f'{bank_amount} Cantina Coins')
-
     await interaction.response.send_message(embed=embed)
 
 client.run(login_key)
