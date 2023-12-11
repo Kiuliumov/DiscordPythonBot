@@ -91,10 +91,6 @@ async def diceroll(interaction: discord.Interaction):
                           color=0xFF5733)
     await interaction.response.send_message(embed=embed)
     await add_coins(interaction.user.id, roll)
-@test.error
-async def on_test_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
-    if isinstance(error, discord.app_commands.CommandOnCooldown):
-        await interaction.response.send_message(str(error), ephemeral=True)
 
 @client.tree.command(name='balance', description='Check your balance')
 async def balance(interaction: discord.Interaction):
