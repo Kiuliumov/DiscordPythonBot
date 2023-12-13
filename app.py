@@ -1,46 +1,13 @@
-
 import discord
 from discord.ext import commands
-import json
-import os
-from apikeys import login_key
 import random
 import requests
+from modules.games import Games
+from modules.economy import Economy
+from apikeys import login_key
 
 intents = discord.Intents.default()
 client = commands.Bot(command_prefix="!", intents=intents)
-os.chdir("C:\\Users\\mitib\\OneDrive\\Documents\\GitHub\\DiscordPythonBot\\")
-
-async def add_coins(user_id, coins_to_add):
-    
-    with open('bank.json', 'r') as f:
-        users = json.load(f)
-        users[str(user_id)]['bank'] += coins_to_add
-    with open('bank.json', 'w') as f:
-        json.dump(users, f, indent=2)
-    return users[str(user_id)]['bank']
-
-
-
-
-
-async def open_account(user_id):
-    with open('bank.json', 'r') as f:
-        users = json.load(f)
-
-    if str(user_id) in users:
-        return False
-    else:
-        users[str(user_id)] = {'bank': 500}
-
-    with open('bank.json', 'w') as f:
-        json.dump(users, f)
-    return True
-
-async def get_bank_data():
-    with open('bank.json', 'r') as f:
-        users = json.load(f)
-    return users
 
 @client.event
 async def on_ready():
@@ -79,11 +46,9 @@ async def dogpicture(interaction: discord.Interaction):
     picture = response_API.json()
     picture = picture['message']
     await interaction.response.send_message(picture)
-import discord
-import random
 
 @client.tree.command(name='roll', description='Rolls a random number between 1 and 100 and gives you this many cantina coins!')
-@discord.app_commands.checks.cooldown(1,28800, key=lambda i: (i.guild_id, i.user.id))
+@commands.cooldown(1, 28800, key=lambda i: (i.guild_id, i.user.id))
 async def diceroll(interaction: discord.Interaction):
     roll = random.randint(1, 100)
     id = interaction.user.name
@@ -92,21 +57,21 @@ async def diceroll(interaction: discord.Interaction):
                           description=f'{(str(id)).capitalize()} has rolled {roll}!',
                           color=0xFF5733)
     await interaction.response.send_message(embed=embed)
-    await add_coins(interaction.user.id, roll)
+    await Economy.add_coins(interaction.user.id, roll)
+
 @client.tree.error
-async def on_test_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError):
-    if isinstance(error, discord.app_commands.CommandOnCooldown):
+async def on_test_error(interaction: discord.Interaction, error: commands.CommandError):
+    if isinstance(error, commands.CommandOnCooldown):
         remaining_time = round(error.retry_after, 2)
         hours = int(remaining_time // 3600)
         minutes = int((remaining_time % 3600) // 60)
         seconds = int(remaining_time % 60)
         await interaction.response.send_message(f"This command is on cooldown. Please try again in {hours} hours, {minutes} minutes, and {seconds} seconds.", ephemeral=True)
-@client.tree.command(name='rps',description='Plays rock paper scissors')
 
 @client.tree.command(name='balance', description='Check your balance')
 async def balance(interaction: discord.Interaction):
-    await open_account(interaction.user.id)
-    users = await get_bank_data()
+    await Economy.open_account(interaction.user.id)
+    users = await Economy.get_bank_data()
     bank_amount = users[str(interaction.user.id)]['bank']
 
     embed = discord.Embed(
@@ -114,7 +79,7 @@ async def balance(interaction: discord.Interaction):
         description=f"{interaction.user.name.capitalize()}'s balance!",
         color=0xFF5733
     )
-    embed.add_field(name='',value=f'{bank_amount} Cantina Coins')
+    embed.add_field(name='', value=f'{bank_amount} Cantina Coins')
     await interaction.response.send_message(embed=embed)
 
 client.run(login_key)
