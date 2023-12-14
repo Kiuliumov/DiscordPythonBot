@@ -9,6 +9,16 @@ class Economy:
         json.dump(users, f, indent=2)
      return users[str(user_id)]['bank']
     
+    async def remove_coins(user_id, coins_to_remove):
+     with open('bank.json', 'r') as f:
+        users = json.load(f)
+        users[str(user_id)]['bank'] -= coins_to_remove
+     with open('bank.json', 'w') as f:
+        json.dump(users, f, indent=2)
+     return users[str(user_id)]['bank']
+
+
+
     async def open_account(user_id):
      with open('bank.json', 'r') as f:
         users = json.load(f)

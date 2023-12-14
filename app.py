@@ -48,7 +48,7 @@ async def dogpicture(interaction: discord.Interaction):
     await interaction.response.send_message(picture)
 
 @client.tree.command(name='roll', description='Rolls a random number between 1 and 100 and gives you this many cantina coins!')
-@commands.cooldown(1, 28800, key=lambda i: (i.guild_id, i.user.id))
+@discord.app_commands.checks.cooldown(1,28800, key=lambda i: (i.guild_id, i.user.id))
 async def diceroll(interaction: discord.Interaction):
     roll = random.randint(1, 100)
     id = interaction.user.name
@@ -82,4 +82,18 @@ async def balance(interaction: discord.Interaction):
     embed.add_field(name='', value=f'{bank_amount} Cantina Coins')
     await interaction.response.send_message(embed=embed)
 
+@client.tree.command(name='rps', description='Play rock,paper,scissors!')
+async def rps(interaction: discord.Interaction,move: str):
+    result = Games.rps(move)
+    if move in ['rock','paper','scissors']:
+        if result == 'win':
+            await interaction.response.send_message(f'You Won! You chose {move} and the computer chose {Games.computer_choice()}\nYou got 100 Cantina Coins!')
+            await Economy.add_coins(interaction.user.id,100)
+        elif result == 'draw':
+            await interaction.response.send_message(f'Its a draw!! You chose {move} and the computer chose {Games.computer_choice()}')
+        else:
+           await interaction.response.send_message(f'You Lost! You chose {move} and the computer chose {Games.computer_choice()}\nYou lost 100 Cantina Coins!')
+           await Economy.remove_coins(interaction.user.id,100)
+    else:
+        await interaction.response.send_message(f'Only valid moves are rock,paper,scissors!')
 client.run(login_key)
