@@ -1,13 +1,11 @@
 import random
 
 class Games:
- def computer_choice():
-    possible_choices = ['rock', 'paper', 'scissors']
-    return random.choice(possible_choices)
 
  def rps(user_input):
-    computer_choice = computer_choice()
-
+    possible_choices = ['rock', 'paper', 'scissors']
+    computer_choice = random.choice(possible_choices)
+    game_result = 'default'
     if user_input == computer_choice:
         game_result = 'draw'
     else:
@@ -29,4 +27,4 @@ class Games:
             elif computer_choice == 'paper':
                 game_result = 'win'
     
-    return game_result
+    return game_result,computer_choice
