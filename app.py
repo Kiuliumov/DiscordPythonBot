@@ -112,3 +112,6 @@ async def on_test_error(interaction: discord.Interaction, error: commands.Comman
         seconds = int(remaining_time % 60)
         await interaction.response.send_message(f"This command is on cooldown. Please try again in {hours} hours, {minutes} minutes, and {seconds} seconds.", ephemeral=True)
 client.run(login_key)
+@client.tree.command(name='help',description='Shows all the commands the bot has!')
+async def helpcommand(interaction: discord.Interaction):
+    await interaction.response.send_message('All the bot commands: ping,info,dogpicture,balance,roll,rps')
