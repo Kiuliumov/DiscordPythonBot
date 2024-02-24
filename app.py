@@ -114,4 +114,4 @@ async def on_test_error(interaction: discord.Interaction, error: commands.Comman
 client.run(login_key)
 @client.tree.command(name='help',description='Shows all the commands the bot has!')
 async def helpcommand(interaction: discord.Interaction):
-    await interaction.response.send_message('All the bot commands: ping,info,dogpicture,balance,roll,rps')
+    await interaction.response.send_message('All the bot commands: ping,info,dogpicture,balance,roll,rps'
